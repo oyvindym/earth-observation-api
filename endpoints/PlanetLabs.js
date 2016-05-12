@@ -12,10 +12,12 @@ import { HttpOk } from '../statuscodes';
 
 const PlanetLabs = {
 
+  endpoint: 'PlanetLabs',
   config: EndpointService.getEndpoint('planetlabs'),
   start: new Date(),
 
   init(query) {
+    this.location = query.location;
     this.params = {
       'cloud_cover.estimated.lt': query.maxCloudCoverage,
       'acquired.gt': DateService.getDate({daysAgo: query.daysAgo}),
@@ -28,7 +30,7 @@ const PlanetLabs = {
     return new Promise((resolve, reject) => {
       let data = {
         searchDate: new Date(),
-        endpoint: 'PlanetLabs',
+        endpoint: this.endpoint,
         entries: []
       };
       request
@@ -45,26 +47,27 @@ const PlanetLabs = {
                 geometry: e.geometry,
                 id: e.id,
                 platform: null,
-                provider: `Planet Labs (${e.properties.provider})`,
+                provider: `${this.endpoint} (${e.properties.provider})`,
                 thumbnail: e.properties.links.thumbnail,
                 custom: {
                   self: e.properties.links.self
                 }
               });
             });            
-            resolve({status: response.status, data: data});
+            resolve({status: response.status, data});
           } else {
-            reject({status: response.status, data: response.body});
+            reject({status: response.status, data: response});
           }
         });
     });
   },
 
   save(data, status) {
-    console.log('PlanetLabs:', HttpExplanationService.verbose(status), `(${new Date() - this.start}ms)`);
+    console.log(`${this.endpoint}: ${HttpExplanationService.verbose(status)} (${new Date() - this.start}ms)`);
     FileService.write({
-      filepath: this.config.filepath,
-      data: data
+      endpoint: this.endpoint,
+      location: this.location,
+      data
     });
   },
 

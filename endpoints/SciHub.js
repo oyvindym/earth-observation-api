@@ -27,10 +27,12 @@ function getRelAttribute(objects, attribute) {
 
 const SciHub = {
 
+  endpoint: 'SciHub',
   config: EndpointService.getEndpoint('scihub'),
   start: new Date(),
 
   init(query) {
+    this.location = query.location;
     this.polygon = LocationService.getPolygon({location: query.location, depth: 1});
     this.date = DateService.getDate({daysAgo: query.daysAgo});
     this.maxCloudCoverage = query.maxCloudCoverage;
@@ -61,7 +63,7 @@ const SciHub = {
     return new Promise((resolve, reject) => {
       let data = {
         searchDate: new Date(),
-        endpoint: 'SciHub',
+        endpoint: this.endpoint,
         entries: []
       };
       request
@@ -89,19 +91,20 @@ const SciHub = {
                 }
               });
             });            
-            resolve({status: response.statusCode, data: data});
+            resolve({status: response.statusCode, data});
           } else {
-            reject({status: response.statusCode, data: response.body});
+            reject({status: response.statusCode, data: response});
           }
         });
     });
   },
 
   save(data, status) {
-    console.log('SciHub:', HttpExplanationService.verbose(status), `(${new Date() - this.start}ms)`);
+    console.log(`${this.endpoint}: ${HttpExplanationService.verbose(status)} (${new Date() - this.start}ms)`);
     FileService.write({
-      filepath: this.config.filepath,
-      data: data
+      endpoint: this.endpoint,
+      location: this.location,
+      data
     });
   },
 

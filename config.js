@@ -3,28 +3,24 @@
 const endpoints = {
   urthecast: {
     uri: 'https://api.urthecast.com/v1/archive/scenes',
-    filepath: '',
     apiKey: '',
     apiSecret: ''
   },
 
   scihub: {
     uri: 'https://scihub.copernicus.eu/apihub/search',
-    filepath: '',
     username: '',
     password: ''
   },
 
   echo: {
     uri: 'https://api-test.echo.nasa.gov/catalog-rest/echo_catalog/granules.json',
-    filepath: '',
     username: '',
     password: ''
   },
 
   astrodigital: {
     uri: 'https://api.astrodigital.com/v2.0/search',
-    filepath: '',
     username: '',
     password: '',
     apiKey: ''
@@ -34,7 +30,6 @@ const endpoints = {
     uri: 'https://api.planet.com/v0/scenes/ortho/',
     // uri: 'https://api.planet.com/v0/scenes/rapideye',
     // uri: 'https://api.planet.com/v0/scenes/landsat',
-    filepath: '',
     username: '',
     password: '',
     apiKey: ''
@@ -42,7 +37,6 @@ const endpoints = {
 
   digitalglobe: {
     uri: 'https://geobigdata.io/catalog/v1/search?includeRelationships=false',
-    filepath: '',
     username: '',
     password: '',
     clientId: '',

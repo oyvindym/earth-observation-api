@@ -12,10 +12,12 @@ import { HttpOk } from '../statuscodes';
 
 const AstroDigital = {
 
+  endpoint: 'AstroDigital',
   config: EndpointService.getEndpoint('astrodigital'),
   start: new Date(),
 
   init(query) {
+    this.location = query.location;
     this.params = {
       limit: 50,
       intersects: JSON.stringify(LocationService.getPolygon({location: query.location, depth: 3})),
@@ -30,7 +32,7 @@ const AstroDigital = {
     return new Promise((resolve, reject) => {
       let data = {
         searchDate: new Date(),
-        endpoint: 'AstroDigital',
+        endpoint: this.endpoint,
         entries: []
       };
       request
@@ -56,19 +58,20 @@ const AstroDigital = {
                 }
               });
             });            
-            resolve({status: response.status, data: data});
+            resolve({status: response.status, data});
           } else {
-            reject({status: response.status, data: response.body});
+            reject({status: response.status, data: response});
           }
         });
     });
   },
 
   save(data, status) {
-    console.log('AstroDigital:', HttpExplanationService.verbose(status), `(${new Date() - this.start}ms)`);
+    console.log(`${this.endpoint}: ${HttpExplanationService.verbose(status)} (${new Date() - this.start}ms)`);
     FileService.write({
-      filepath: this.config.filepath,
-      data: data
+      endpoint: this.endpoint,
+      location: this.location,
+      data
     });
   },
 

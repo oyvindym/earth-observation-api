@@ -12,10 +12,12 @@ import { HttpOk } from '../statuscodes';
 
 const UrtheCast = {
 
+  endpoint: 'UrtheCast',
   config: EndpointService.getEndpoint('urthecast'),
   start: new Date(),
 
   init(query) {
+    this.location = query.location;
     this.params = {
       api_key: this.config.apiKey,
       api_secret: this.config.apiSecret,
@@ -30,7 +32,7 @@ const UrtheCast = {
     return new Promise((resolve, reject) => {
       let data = {
         searchDate: new Date(),
-        endpoint: 'UrtheCast',
+        endpoint: this.endpoint,
         entries: []
       };
       request
@@ -53,19 +55,20 @@ const UrtheCast = {
                 } 
               });
             });            
-            resolve({status: response.status, data: data});
+            resolve({status: response.status, data});
           } else {
-            reject({status: response.status, data: response.body});
+            reject({status: response.status, data: response});
           }
         });
     });
   },
 
   save(data, status) {
-    console.log('UrtheCast:', HttpExplanationService.verbose(status), `(${new Date() - this.start}ms)`);
+    console.log(`${this.endpoint}: ${HttpExplanationService.verbose(status)} (${new Date() - this.start}ms)`);
     FileService.write({
-      filepath: this.config.filepath,
-      data: data
+      endpoint: this.endpoint,
+      location: this.location,
+      data
     });
   },
 

@@ -21,10 +21,12 @@ function getThumbnail(links) {
 
 const ECHO = {
 
+  endpoint: 'ECHO',
   config: EndpointService.getEndpoint('echo'),
   start: new Date(),
 
   init(query) {
+    this.location = query.location;
     this.params = {
       polygon: this.convertPolygon(LocationService.getPolygon({location: query.location, depth: 1})),
       'cloud_cover[min]': 0,
@@ -47,7 +49,7 @@ const ECHO = {
     return new Promise((resolve, reject) => {
       let data = {
         searchDate: new Date(),
-        endpoint: 'ECHO',
+        endpoint: this.endpoint,
         entries: []
       }
       request
@@ -63,7 +65,7 @@ const ECHO = {
                 geometry: e.polygons !== undefined ? GeoJSONConverter.convertPolygon(e.polygons[0][0]) : null,
                 id: e.producer_granule_id,
                 platform: null,
-                provider: 'ECHO',
+                provider: this.endpoint,
                 thumbnail: getThumbnail(e.links),
                 custom: {
                   updated: e.updated,
@@ -72,19 +74,20 @@ const ECHO = {
                 }
               });
             });
-            resolve({status: response.status, data: data});
+            resolve({status: response.status, data});
           } else {
-            reject({status: response.status, data: response.body});
+            reject({status: response.status, data: response});
           }
         });
     });
   },
 
   save(data, status) {
-    console.log('ECHO:', HttpExplanationService.verbose(status), `(${new Date() - this.start}ms)`);
+    console.log(`${this.endpoint}: ${HttpExplanationService.verbose(status)}, (${new Date() - this.start}ms)`);
     FileService.write({
-      filepath: this.config.filepath,
-      data: data
+      endpoint: this.endpoint,
+      location: this.location,
+      data
     });
   },
 

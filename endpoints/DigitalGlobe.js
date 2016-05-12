@@ -15,10 +15,12 @@ import { HttpOk } from '../statuscodes';
 
 const DigitalGlobe = {
 
+  endpoint: 'DigitalGlobe',
   config: EndpointService.getEndpoint('digitalglobe'),
   start: new Date(),
 
   init(query) {
+    this.location = query.location;
     this.params = {
       searchAreaWkt: WKTConverter.convertPolygon((LocationService.getPolygon({location: query.location, depth: 1}))),
       types: ['Acquisition'],
@@ -32,7 +34,7 @@ const DigitalGlobe = {
     return new Promise((resolve, reject) => {
       let data = {
         searchDate: new Date(),
-        endpoint: 'DigitalGlobe',
+        endpoint: this.endpoint,
         entries: []
       };
       request
@@ -54,19 +56,20 @@ const DigitalGlobe = {
                 custom: {}
               });
             });            
-            resolve({status: response.status, data: data});
+            resolve({status: response.status, data});
           } else {
-            reject({status: response.status, data: reponse.body});
+            reject({status: response.status, data: response});
           }
         });
     });
   },
 
   save(data, status) {
-    console.log('DigitalGlobe:', HttpExplanationService.verbose(status), `(${new Date() - this.start}ms)`);
+    console.log(`${this.endpoint}: ${HttpExplanationService.verbose(status)} (${new Date() - this.start}ms)`);
     FileService.write({
-      filepath: this.config.filepath,
-      data: data
+      endpoint: this.endpoint,
+      location: this.location,
+      data
     });
   },
 
