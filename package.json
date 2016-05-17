@@ -1,5 +1,5 @@
 {
-  "name": "Earth Observation API",
+  "name": "oyvinds-earth-observation-api",
   "version": "1.0.0",
   "description": "Sample application for testing different satellite imagery services and their APIs",
   "main": "index.js",
